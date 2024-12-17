@@ -2,11 +2,11 @@ package com.algaworks.algafood.infrastructure.repository;
 
 import java.util.List;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.algaworks.algafood.domain.model.Cozinha;
 import com.algaworks.algafood.domain.model.Estado;
-import com.algaworks.algafood.domain.model.Restaurante;
 import com.algaworks.algafood.domain.repository.EstadoRepository;
 
 import jakarta.persistence.EntityManager;
@@ -18,7 +18,6 @@ public class EstadoRepositoryImpl implements EstadoRepository {
 
     @PersistenceContext
     private EntityManager manager;
-    
     
     @Override
     public List<Estado> listar() {
@@ -33,13 +32,18 @@ public class EstadoRepositoryImpl implements EstadoRepository {
     }
 
     @Override
+    @Transactional
     public Estado salvar(Estado estado) {
       return manager.merge(estado);
     }
 
     @Override
-    public void remover(Estado estado) {
-      var estadoBuscado =  buscar(estado.getId());
+    @Transactional
+    public void remover(Long id) {
+      var estadoBuscado =  buscar(id);
+      if(estadoBuscado == null){
+            throw new EmptyResultDataAccessException(1);
+        }
       manager.remove(estadoBuscado);
     }
     

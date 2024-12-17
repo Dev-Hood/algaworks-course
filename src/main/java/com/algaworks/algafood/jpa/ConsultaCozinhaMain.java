@@ -12,7 +12,6 @@ import com.algaworks.algafood.domain.model.Cozinha;
 import com.algaworks.algafood.domain.model.Restaurante;
 import com.algaworks.algafood.domain.repository.CozinhaRepository;
 import com.algaworks.algafood.domain.repository.RestauranteRepository;
-import com.algaworks.algafood.infrastructure.repository.CozinhaRepositoryImpl;
 
 public class ConsultaCozinhaMain {
     public static void main(String[] args) {
@@ -43,7 +42,7 @@ public class ConsultaCozinhaMain {
 
         System.out.println(cbuscada.getNome());
         System.out.println("----------- removendo cozinha 1l");
-        cozinhaRepository.remover(cbuscada);
+        cozinhaRepository.remover(cbuscada.getId());
 
 
         RestauranteRepository restauranteRepository = applicationContext.getBean(RestauranteRepository.class);
@@ -74,7 +73,7 @@ public class ConsultaCozinhaMain {
 
         System.out.println(restB.getNome());
         System.out.println("----------- removendo Restaurante 1l");
-        restauranteRepository.remover(restB);
+       
 
     }
 }

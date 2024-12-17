@@ -1,9 +1,8 @@
 package com.algaworks.algafood.api.controller;
 
-
 import java.util.List;
 
-import org.springframework.beans.BeanUtils;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -15,43 +14,33 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.algaworks.algafood.domain.exeption.EntidadeEmUsoExeption;
 import com.algaworks.algafood.domain.exeption.EntidadeNaoEncontradaExeption;
-import com.algaworks.algafood.domain.model.Cozinha;
-import com.algaworks.algafood.domain.repository.CozinhaRepository;
-import com.algaworks.algafood.domain.service.CozinhaService;
-
+import com.algaworks.algafood.domain.model.Cidade;
+import com.algaworks.algafood.domain.service.CidadeService;
 
 @RestController
-@RequestMapping("/cozinhas")
-public class CozinhaController {
-    
-    private CozinhaRepository cozinhaRepository;
-
-    @Autowired
-    private CozinhaService service;
-
-    public CozinhaController(CozinhaRepository repository){
-        this.cozinhaRepository = repository;
-    }
+@RequestMapping("/cidade")
+public class CidadeController {
+     @Autowired
+    private CidadeService service;
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<Cozinha> listar(){
+    public List<Cidade> listar(){
         return service.listar();
     }
 
 
-    @GetMapping("/{cozinhaId}")
-    public ResponseEntity<Cozinha> buscar(@PathVariable("cozinhaId") Long id){
+    @GetMapping("/{cidadeId}")
+    public ResponseEntity<Cidade> buscar(@PathVariable("cidadeId") Long id){
        
         
-        var cozinha = service.buscar(id);
+        var cidade = service.buscar(id);
 
-        if (cozinha != null) {
-            return ResponseEntity.ok(cozinha);
+        if (cidade != null) {
+            return ResponseEntity.ok(cidade);
         }
 
         //return  ResponseEntity.status(HttpStatus.OK).body(cozinha);
@@ -66,33 +55,37 @@ public class CozinhaController {
     }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public Cozinha adicionar( @RequestBody Cozinha cozinha){
-        return service.salvar(cozinha);
+    public ResponseEntity<?> adicionar( @RequestBody Cidade cidade){
+
+        try {
+            Cidade cidadeSalva = service.salvar(cidade);
+            return ResponseEntity.status(HttpStatus.CREATED).body(cidadeSalva);
+        } catch (EntidadeNaoEncontradaExeption e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+
     }
 
-    @PutMapping("/{cozinhaId}")
-    public ResponseEntity<Cozinha> atualizar(@PathVariable Long cozinhaId, @RequestBody Cozinha cozinha){
-        Cozinha cozinhaAtual = cozinhaRepository.buscar(cozinhaId);
+    @PutMapping("/{cidadeId}")
+    public ResponseEntity<?> atualizar(@PathVariable Long cidadeId, @RequestBody Cidade cidade){
+        Cidade cidadeAtual = service.buscar(cidadeId);
 
-        //cozinhaAtual.setNome(cozinha.getNome());
-
-        if(cozinhaAtual != null){
-            BeanUtils.copyProperties(cozinha, cozinhaAtual,"id");
-
-            cozinhaAtual = service.salvar(cozinhaAtual);
-    
-            return ResponseEntity.ok(cozinhaAtual);
+        if(cidadeAtual != null){
+            try {
+                cidadeAtual = service.atualizar(cidadeAtual, cidade);
+                return ResponseEntity.ok(cidadeAtual);
+            } catch (EntidadeNaoEncontradaExeption e) {
+                return ResponseEntity.badRequest().body(e.getMessage());
+            }
         }
 
         return ResponseEntity.notFound().build();
-       
     }
 
-    @DeleteMapping("/{cozinhaId}")
-    public ResponseEntity<Cozinha> deletar(@PathVariable Long cozinhaId){
+    @DeleteMapping("/{cidadeId}")
+    public ResponseEntity<Cidade> deletar(@PathVariable Long cidadeId){
         try {
-            service.excluir(cozinhaId);
+            service.excluir(cidadeId);
             return ResponseEntity.noContent().build();
         } catch (EntidadeNaoEncontradaExeption e) {
             return ResponseEntity.badRequest().build();
